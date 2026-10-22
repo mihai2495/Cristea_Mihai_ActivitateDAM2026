@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">AndroidSeminar4</string>
+
+    <string-array name="tipuri_camera">
+        <item>DSLR</item>
+        <item>Mirrorless</item>
+        <item>Compactă</item>
+        <item>Instant</item>
+    </string-array>
+</resources>
