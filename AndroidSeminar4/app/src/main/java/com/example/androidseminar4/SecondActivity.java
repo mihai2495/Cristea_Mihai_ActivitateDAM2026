@@ -52,24 +52,34 @@ public class SecondActivity extends AppCompatActivity {
         btnSalveaza.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String marca = etMarca.getText().toString();
-                String pretText = etPret.getText().toString();
+                String marca = etMarca.getText().toString().trim();
+                String pretText = etPret.getText().toString().trim();
 
                 if (marca.isEmpty() || pretText.isEmpty()) {
-                    Toast.makeText(SecondActivity.this, "Completeaza marca si pretul", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SecondActivity.this,
+                            "Completeaza marca si pretul", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                double pret = Double.parseDouble(pretText);
+                double pret;
+                try {
+                    pret = Double.parseDouble(pretText);
+                } catch (NumberFormatException e) {
+                    Toast.makeText(SecondActivity.this,
+                            "Pret invalid", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 String tip = spTip.getSelectedItem().toString();
                 String denumire = marca + " " + tip;
 
-                String stare;
-                if (rgStare.getCheckedRadioButtonId() == R.id.rbNoua) {
-                    stare = "Noua";
-                } else {
-                    stare = "Folosita";
+                int selectedId = rgStare.getCheckedRadioButtonId();
+                if (selectedId == -1) {
+                    Toast.makeText(SecondActivity.this,
+                            "Selecteaza starea", Toast.LENGTH_SHORT).show();
+                    return;
                 }
+                String stare = (selectedId == R.id.rbNoua) ? "Noua" : "Folosita";
 
                 boolean areWifi = cbWifi.isChecked();
                 boolean areBlitz = swBlitz.isChecked();
@@ -78,13 +88,9 @@ public class SecondActivity extends AppCompatActivity {
                 cameraFoto camera = new cameraFoto(denumire, pret, areWifi, stare, rating, areBlitz);
 
                 Intent intent = new Intent();
-                intent.putExtra("denumire", camera.denumire);
-                intent.putExtra("pret", camera.pret);
-                intent.putExtra("areWifi", camera.areWifi);
-                intent.putExtra("stare", camera.stare);
-                intent.putExtra("rating", camera.rating);
-                intent.putExtra("areBlitz", camera.areBlitz);
-
+                Bundle bundle = new Bundle();
+                bundle.putParcelable("camera", camera);
+                intent.putExtras(bundle);
                 setResult(RESULT_OK, intent);
                 finish();
             }

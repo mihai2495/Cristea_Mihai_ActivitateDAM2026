@@ -11,53 +11,33 @@ import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.IntentCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
     TextView tvRezultat;
     Button btnAdauga;
 
+    ArrayList<cameraFoto> listaCamere = new ArrayList<>();
+
     ActivityResultLauncher<Intent> launcher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                    Intent data = result.getData();
+                    cameraFoto camera = IntentCompat.getParcelableExtra(
+                            result.getData(), "camera", cameraFoto.class);
 
-                    String denumire = data.getStringExtra("denumire");
-                    double pret = data.getDoubleExtra("pret", 0);
-                    boolean areWifi = data.getBooleanExtra("areWifi", false);
-                    String stare = data.getStringExtra("stare");
-                    float rating = data.getFloatExtra("rating", 0);
-                    boolean areBlitz = data.getBooleanExtra("areBlitz", false);
-
-                    cameraFoto camera = new cameraFoto(denumire, pret, areWifi, stare, rating, areBlitz);
-
-                    String wifi;
-                    if (camera.areWifi) {
-                        wifi = "da";
-                    } else {
-                        wifi = "nu";
+                    if (camera != null) {
+                        listaCamere.add(camera);
+                        tvRezultat.setText(camera.toString());
+                        Toast.makeText(MainActivity.this,
+                                "Camera a fost adaugata", Toast.LENGTH_SHORT).show();
                     }
-
-                    String blitz;
-                    if (camera.areBlitz) {
-                        blitz = "da";
-                    } else {
-                        blitz = "nu";
-                    }
-
-                    String text = "Denumire: " + camera.denumire + "\n"
-                            + "Pret: " + camera.pret + " RON\n"
-                            + "Wi-Fi: " + wifi + "\n"
-                            + "Stare: " + camera.stare + "\n"
-                            + "Rating: " + camera.rating + "\n"
-                            + "Blitz: " + blitz;
-
-                    tvRezultat.setText(text);
-                    Toast.makeText(MainActivity.this, "Camera a fost adaugata", Toast.LENGTH_SHORT).show();
                 }
             });
 
@@ -78,7 +58,8 @@ public class MainActivity extends AppCompatActivity {
         btnAdauga.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, SecondActivity.class);
+                Intent intent = new Intent(MainActivity.this, SecondActivityAI.class);
+                //sau SecondActivity pt activitatea facuta de mine
                 launcher.launch(intent);
             }
         });
